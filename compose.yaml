@@ -1,0 +1,28 @@
+services:
+  web:
+    build: .
+    ports: ['127.0.0.1:8086:80']
+    volumes: ['.:/var/www/html']
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: mariadb:10.11
+    environment:
+      MARIADB_ROOT_PASSWORD: wxshare_local_root
+      MARIADB_DATABASE: wxshare
+      MARIADB_USER: wxshare
+      MARIADB_PASSWORD: wxshare_local
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./wxzdy_share.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    networks:
+      default:
+        aliases: [wxshare-db]
+    healthcheck:
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+      interval: 3s
+      timeout: 3s
+      retries: 30
+volumes:
+  db-data:

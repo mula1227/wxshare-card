@@ -1,0 +1,4 @@
+upload/
+access_token.json
+jsapi_ticket.json
+.env
